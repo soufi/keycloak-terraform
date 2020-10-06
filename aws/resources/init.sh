@@ -22,27 +22,16 @@ sudo chmod +x /usr/local/bin/docker-compose
 sudo chmod 666 /var/run/docker.sock
 
 #COPYING DOCKER COMPOSE FILE AND ENVIRONMENT FILES
-mkdir -p /opt/csgo
+mkdir -p /opt/jenkins
 
-cat << 'EOF' > /opt/csgo/docker-compose.yml
+cat << 'EOF' > /opt/jenkins/docker-compose.yml
 ${docker_compose_conf}
 EOF
 
-cat << 'EOF' > /opt/csgo/.env
-TOKEN=${csgo_token_game}
-HOSTNAME=${csgo_hostname}
-IP="${csgo_ip}"
-PUBLIC_IP="${csgo_public_ip}"
-PW=${csgo_pwd}
-RCONPW=${csgo_rconpw}
-PORT=${csgo_port}
-TV_PORT=${csgo_tv_port}
-MAP=${csgo_map}
-MAX_PLAYERS=${csgo_max_players}
-GAMETYPE=${csgo_gametype}
-GAMEMODE=${csgp_gamemode}
+cat << 'EOF' > /opt/jenkins/.env
+JENKINS_PORT=${jenkins_port}
 EOF
 
 # Run the Server
-cd /opt/csgo
+cd /opt/jenkins
 docker-compose up -d
