@@ -1,6 +1,6 @@
 # CSGO TERRAFORM
 
-The formation deploys [CSGO](https://hub.docker.com/r/cm2network/csgo) using docker-compose. It also deploys [Portainer](https://hub.docker.com/r/portainer/portainer) to manage the containers.
+The formation deploys Jenkins on docker-compose. 
 
 ## Install 
 
@@ -57,9 +57,3 @@ You must be located inside one of the providers to execute the following:
 ```bash
 $ ./bin/plan.sh /path/to/params.tfvar.json
 ```
-
-## Useful Links
-
-- [Maps](https://liquipedia.net/counterstrike/Portal:Maps)
-- [Advanced Configuration](https://developer.valvesoftware.com/wiki/Counter-Strike:_Global_Offensive_Dedicated_Servers#Advanced_Configuration)
-- [Game Mode](https://developer.valvesoftware.com/wiki/CSGO_Game_Mode_Commands)
