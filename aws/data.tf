@@ -13,7 +13,7 @@ data "template_file" "init_script" {
 
   vars = {
     docker_compose_conf   = file("${path.module}/resources/docker-compose.yml")
-    jenkins_port       = var.jenkins_port
+    jenkins_port          = var.jenkins_port
   }
 }
 
