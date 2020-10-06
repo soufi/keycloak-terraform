@@ -1,6 +1,6 @@
-# CSGO TERRAFORM
+# Jenkins TERRAFORM
 
-The formation deploys Jenkins on docker-compose. 
+The formation deploys Jenkins (1 Node) using docker-compose on a VM. 
 
 ## Install 
 
