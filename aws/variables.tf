@@ -24,6 +24,15 @@ variable "vpc_cidr" {
   default = "172.31.0.0/20"
 }
 
+variable "existing_vpc_id" {
+  default = ""
+}
+
+variable "existing_subnet_ids" {
+  type = list(string)
+  default = []
+}
+
 variable key_pair_name {
   default = "csgo-server-key-pair"
 }

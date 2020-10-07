@@ -4,6 +4,7 @@ resource "aws_vpc" "vpc" {
   cidr_block           = var.vpc_cidr
   enable_dns_support   = true
   enable_dns_hostnames = true
+  count                = var.existing_vpc_id != "" ? 0 : 1
 
   tags = {
     Name = "${var.name}-vpc"
@@ -11,14 +12,15 @@ resource "aws_vpc" "vpc" {
 }
 
 resource "aws_subnet" "public" {
-  vpc_id = aws_vpc.vpc.id
+  vpc_id = aws_vpc.vpc[0].id
   cidr_block = cidrsubnet(
     var.vpc_cidr,
     24 - replace(var.vpc_cidr, "/[^/]*[/]/", ""),
-    0
+    count.index
   )
   map_public_ip_on_launch = true
-  availability_zone       = element(data.aws_availability_zones.available.names, 0)
+  count                   = var.existing_vpc_id != "" ? 0 : 1
+  availability_zone       = element(data.aws_availability_zones.available.names, count.index)
 
   tags = {
     Name = "${var.name}-subnet"
@@ -26,11 +28,12 @@ resource "aws_subnet" "public" {
 }
 
 resource "aws_route_table" "rt" {
-  vpc_id = aws_vpc.vpc.id
+  vpc_id = aws_vpc.vpc[0].id
+  count  = var.existing_vpc_id != "" ? 0 : 1
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.gw.id
+    gateway_id = aws_internet_gateway.gw[0].id
   }
 
   tags = {
@@ -39,17 +42,20 @@ resource "aws_route_table" "rt" {
 }
 
 resource "aws_main_route_table_association" "a" {
-  vpc_id         = aws_vpc.vpc.id
-  route_table_id = aws_route_table.rt.id
+  vpc_id         = aws_vpc.vpc[0].id
+  count          = var.existing_vpc_id != "" ? 0 : 1
+  route_table_id = aws_route_table.rt[0].id
 }
 
 resource "aws_route_table_association" "rta" {
-  subnet_id      = aws_subnet.public.id
-  route_table_id = aws_route_table.rt.id
+  count          = length(aws_subnet.public)
+  subnet_id      = element(aws_subnet.public.*.id, count.index)
+  route_table_id = aws_route_table.rt[0].id
 }
 
 resource "aws_internet_gateway" "gw" {
-  vpc_id = aws_vpc.vpc.id
+  vpc_id = aws_vpc.vpc[0].id
+  count  = var.existing_vpc_id != "" ? 0 : 1
 
   tags = {
     Name = "${var.name}-gw"
@@ -72,8 +78,9 @@ resource "aws_instance" "server" {
   instance_type               = var.instance_type
   associate_public_ip_address = true
   vpc_security_group_ids      = [aws_security_group.sg.id]
-  subnet_id                   = aws_subnet.public.id
-  
+  #subnet_id                   = aws_subnet.public.id
+  subnet_id                   = element(concat(var.existing_subnet_ids, aws_subnet.public.*.id), 0)
+
   key_name = var.key_pair_name
 
   tags = {
