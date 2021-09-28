@@ -57,3 +57,10 @@ You must be located inside one of the providers to execute the following:
 ```bash
 $ ./bin/plan.sh /path/to/params.tfvar.json
 ```
+
+## Generate SSH Key
+in order to generate a new ssh key pair:
+
+```
+$ ssh-keygen -t rsa -b 4096 -f jenkins-key
+```

@@ -7,7 +7,7 @@ volumes:
 
 services:
   jenkins:
-    image: bitnami/jenkins:latest
+    image: jenkins/jenkins:lts-jdk8
     container_name: jenkins
     restart: unless-stopped
     privileged: true
