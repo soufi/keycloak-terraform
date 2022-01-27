@@ -44,6 +44,30 @@ variable "egress_cidr_blocks" {
   default = ["0.0.0.0/0"]
 }
 
-variable "jenkins_port" {
+variable "kclk_web_port" {
   default = 8081
+}
+
+variable "kclk_ws_port" {
+  default = 8082
+}
+
+variable "kclk_postgres_db" {
+  default = "keycloak"
+}
+
+variable "kclk_postgres_user" {
+  default = "keycloak"
+}
+
+variable "kclk_postgres_pwd" {
+  default = "Pa55w0rd"
+}
+
+variable "kclk_user" {
+  default = "keycloak"
+}
+
+variable "kclk_pwd" {
+  default = "Pa55w0rd.2008!"
 }

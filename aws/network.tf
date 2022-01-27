@@ -27,12 +27,22 @@ resource "aws_security_group_rule" "ssh" {
   description       = "SSH access"
 }
 
-resource "aws_security_group_rule" "jenkins" {
+resource "aws_security_group_rule" "kclk_web_port" {
   type              = "ingress"
-  from_port         = var.jenkins_port
-  to_port           = var.jenkins_port
+  from_port         = var.kclk_web_port
+  to_port           = var.kclk_web_port
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.sg.id
-  description       = "Jenkins access"
+  description       = "Keycloak Web Port"
+}
+
+resource "aws_security_group_rule" "kclk_ws_port" {
+  type              = "ingress"
+  from_port         = var.kclk_ws_port
+  to_port           = var.kclk_ws_port
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.sg.id
+  description       = "Keycloak WS Port"
 }

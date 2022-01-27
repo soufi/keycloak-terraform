@@ -1,21 +1,67 @@
 version: '3.8'
 
 volumes:
-  jenkins-vol:
-    name: jenkins-volume
+  kclk-db-vol:
+    name: kclk-db-data
     driver: local
 
 services:
-  jenkins:
-    image: jenkins/jenkins:lts-jdk8
-    container_name: jenkins
-    restart: unless-stopped
-    privileged: true
-    user: root
-    ports:
-      - ${JENKINS_PORT}:8080
-      - 50000:50000
+
+  keycloak_db:
+    image: postgres
+    container_name: 'kclk-db'
+    environment:
+      POSTGRES_DB: ${KCLK_POSTGRES_DB}
+      POSTGRES_USER: ${KCLK_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${KCLK_POSTGRES_PASSWORD}
     volumes:
-      - jenkins-vol:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /usr/local/bin/docker:/usr/local/bin/docker
+      - kclk-db-vol:/var/lib/postgresql/data 
+    restart: unless-stopped
+
+  keycloak:
+    image: jboss/keycloak:14.0.0
+    container_name: kclk
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: keycloak_db
+      DB_DATABASE: "${KCLK_POSTGRES_DB}"
+      DB_USER: "${KCLK_POSTGRES_USER}"
+      DB_SCHEMA: public
+      DB_PASSWORD: "${KCLK_POSTGRES_PASSWORD}"
+      KEYCLOAK_USER: "${KCLK_USER}"
+      KEYCLOAK_PASSWORD: "${KCLK_PASSWORD}"
+      #KEYCLOAK_IMPORT: "/tmp/keycloak/realm.json"
+      # Uncomment the line below if you want to specify JDBC parameters. The parameter below is just an example, and it shouldn't be used in production without knowledge. It is highly recommended that you read the PostgreSQL JDBC driver documentation in order to use it.
+      #JDBC_PARAMS: "ssl=true"
+    # ports:
+      #- ${KCLK_PORT}:8080
+      #- ${KCLK_PORT}:8443
+    #volumes: 
+      #- "./conf/keycloak/realm-export.json:/tmp/keycloak/realm.json"
+      #- ./cert/keycloak/certificate.cert:/etc/x509/https/tls.crt
+      #- ./cert/keycloak/certificate.key:/etc/x509/https/tls.key
+    depends_on:
+      - keycloak_db
+    restart: unless-stopped
+
+  keycloak_proxy:
+    container_name: kclk-nginx
+    image: nginx
+    #For certificate renewal, reloads every 6h the configuration
+    # command: >
+    #     /bin/sh -c " 
+    #       /sbin/ip route|awk '/default/ { print $$3\"  host.docker.internal\" }' >> /etc/hosts; 
+    #       while :; do sleep 6h & wait $${!}; nginx -s reload; done &
+    #       nginx -g \"daemon off;\" 
+    #     "
+    restart: unless-stopped
+    depends_on:
+      - keycloak
+    ports:
+      - ${KCLK_PROXY_WEB_PORT}:80
+      - ${KCLK_PROXY_WS_PORT}:443
+    volumes:
+      - ./conf/nginx/keycloak-conf:/etc/nginx/conf.d
+      # - ./conf/certbot/conf:/etc/letsencrypt
+      # - ./conf/certbot/www:/var/www/certbot
+
