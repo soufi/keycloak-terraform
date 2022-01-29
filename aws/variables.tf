@@ -5,7 +5,7 @@ variable secret_key {}
 variable region {}
 
 variable name {
-  default = "jenkins-server"
+  default = "keycloak-server"
 }
 
 variable "ami_name" {

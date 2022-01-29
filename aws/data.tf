@@ -13,6 +13,7 @@ data "template_file" "init_script" {
 
   vars = {
     docker_compose_conf     = file("${path.module}/resources/docker-compose.yml")
+    nginx_keycloak_conf     = file("${path.module}/resources/conf/nginx/keycloak-conf/app.conf")
     KCLK_PROXY_WEB_PORT     = var.kclk_web_port
     KCLK_PROXY_WS_PORT      = var.kclk_ws_port
     KCLK_POSTGRES_DB        = var.kclk_postgres_db
